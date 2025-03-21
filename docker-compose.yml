@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/remittance
+      - SPRING_DATASOURCE_USERNAME=remittance_user
+      - SPRING_DATASOURCE_PASSWORD=remittance_password
+    networks:
+      - remittance-network
+
+  db:
+    image: mariadb:10.6
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=remittance
+      - MYSQL_USER=remittance_user
+      - MYSQL_PASSWORD=remittance_password
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - remittance-network
+
+networks:
+  remittance-network:
+    driver: bridge
+
+volumes:
+  mariadb-data:

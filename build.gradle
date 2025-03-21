@@ -1,0 +1,121 @@
+buildscript {
+    ext {
+        springBootVersion = '3.2.3'
+        springDependencyManagementVersion = '1.1.4'
+        javaVersion = JavaVersion.VERSION_17
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${springBootVersion}" apply false
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}" apply false
+}
+
+allprojects {
+    group = 'com.wirebarley'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencies {
+        // Lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        // Test
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    tasks.named('bootJar') {
+        enabled = false
+    }
+
+    tasks.named('jar') {
+        enabled = true
+    }
+}
+
+// 공통 모듈
+project(':remittance-common') {
+    dependencies {
+        implementation 'com.fasterxml.uuid:java-uuid-generator:5.1.0'
+        implementation 'org.springframework:spring-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+    }
+}
+
+// 도메인 모듈 (엔티티, 값 객체, 리포지토리 인터페이스)
+project(':remittance-domain') {
+    dependencies {
+        implementation project(':remittance-common')
+    }
+}
+
+// 애플리케이션 모듈 (서비스, 유스케이스)
+project(':remittance-application') {
+    dependencies {
+        implementation project(':remittance-domain')
+        implementation project(':remittance-common')
+
+        // 서비스 레이어에 필요한 의존성
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation "org.springframework:spring-tx"
+    }
+}
+
+// 인프라스트럭처 모듈 (리포지토리 구현, 외부 API 연동)
+project(':remittance-infrastructure') {
+    dependencies {
+        implementation project(':remittance-domain')
+        implementation project(':remittance-common')
+
+        // 인프라스트럭처 레이어에 필요한 의존성
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.redisson:redisson-spring-boot-starter:3.24.3'
+        runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+        testImplementation 'com.h2database:h2'
+    }
+}
+
+// API 모듈 (컨트롤러, 외부 API)
+project(':remittance-api') {
+    dependencies {
+        implementation project(':remittance-application')
+        implementation project(':remittance-infrastructure') // 필수: 리포지토리 구현체 DI를 위해
+        implementation project(':remittance-domain')
+        implementation project(':remittance-common')
+
+        // API 레이어에 필요한 의존성
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    }
+
+    tasks.named('bootJar') {
+        enabled = true
+    }
+}
