@@ -1,5 +1,6 @@
-package com.wirebarley.remittance.infrastructure.common.lock;
+package com.wirebarley.remittance.common.lock;
 
+import com.wirebarley.remittance.common.error.LockAcquisitionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;

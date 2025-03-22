@@ -5,7 +5,7 @@ import com.wirebarley.remittance.domain.transaction.TransactionStatus;
 import com.wirebarley.remittance.domain.transaction.TransactionType;
 import com.wirebarley.remittance.domain.transaction.port.TransactionPort;
 import com.wirebarley.remittance.infrastructure.transaction.entity.TransactionEntity;
-import com.wirebarley.remittance.infrastructure.transaction.repository.JpaTransactionRepository;
+import com.wirebarley.remittance.infrastructure.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,46 +20,46 @@ import java.util.stream.Collectors;
  */
 @Repository
 @RequiredArgsConstructor
-public class TransactionRepositoryAdapter implements TransactionPort {
-    private final JpaTransactionRepository jpaTransactionRepository;
+public class TransactionAdapter implements TransactionPort {
+    private final TransactionRepository transactionRepository;
 
     @Override
     public Transaction save(Transaction transaction) {
         TransactionEntity entity = TransactionEntity.fromDomain(transaction);
-        TransactionEntity savedEntity = jpaTransactionRepository.save(entity);
+        TransactionEntity savedEntity = transactionRepository.save(entity);
         return savedEntity.toDomain();
     }
 
     @Override
     public Optional<Transaction> findById(UUID id) {
-        return jpaTransactionRepository.findById(id)
+        return transactionRepository.findById(id)
                 .map(TransactionEntity::toDomain);
     }
 
     @Override
     public List<Transaction> findBySourceAccountId(UUID accountId) {
-        return jpaTransactionRepository.findBySourceAccountId(accountId).stream()
+        return transactionRepository.findBySourceAccountId(accountId).stream()
                 .map(TransactionEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Transaction> findByTargetAccountId(UUID accountId) {
-        return jpaTransactionRepository.findByTargetAccountId(accountId).stream()
+        return transactionRepository.findByTargetAccountId(accountId).stream()
                 .map(TransactionEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Transaction> findByType(TransactionType type) {
-        return jpaTransactionRepository.findByType(type).stream()
+        return transactionRepository.findByType(type).stream()
                 .map(TransactionEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Transaction> findByStatus(TransactionStatus status) {
-        return jpaTransactionRepository.findByStatus(status).stream()
+        return transactionRepository.findByStatus(status).stream()
                 .map(TransactionEntity::toDomain)
                 .collect(Collectors.toList());
     }

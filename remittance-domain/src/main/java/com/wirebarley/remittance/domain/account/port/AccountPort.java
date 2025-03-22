@@ -33,6 +33,13 @@ public interface AccountPort {
     Optional<Account> findByAccountNumber(String accountNumber);
     
     /**
+     * 마스킹된 계좌번호로 계좌 조회
+     * @param maskedAccountNumber 마스킹된 계좌번호 패턴
+     * @return 계좌 목록
+     */
+    List<Account> findByMaskedAccountNumber(String maskedAccountNumber);
+    
+    /**
      * 모든 계좌 조회
      * @return 계좌 목록
      */

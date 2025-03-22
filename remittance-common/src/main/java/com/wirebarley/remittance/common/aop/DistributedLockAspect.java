@@ -1,8 +1,7 @@
-package com.wirebarley.remittance.infrastructure.common.aop;
+package com.wirebarley.remittance.common.aop;
 
-import com.wirebarley.remittance.common.aop.DistributedLock;
-import com.wirebarley.remittance.infrastructure.common.lock.LockAcquisitionException;
-import com.wirebarley.remittance.infrastructure.common.lock.RedissonLockService;
+import com.wirebarley.remittance.common.error.LockAcquisitionException;
+import com.wirebarley.remittance.common.lock.RedissonLockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

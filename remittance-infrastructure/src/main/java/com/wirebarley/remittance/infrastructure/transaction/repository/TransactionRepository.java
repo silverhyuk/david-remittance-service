@@ -13,7 +13,7 @@ import java.util.UUID;
  * JPA 트랜잭션 리포지토리
  */
 @Repository
-public interface JpaTransactionRepository extends JpaRepository<TransactionEntity, UUID> {
+public interface TransactionRepository extends JpaRepository<TransactionEntity, UUID> {
     /**
      * 출금 계좌 ID로 트랜잭션 조회
      * @param sourceAccountId 출금 계좌 ID

@@ -3,7 +3,8 @@ package com.wirebarley.remittance.infrastructure.account.adapter;
 import com.wirebarley.remittance.domain.account.Account;
 import com.wirebarley.remittance.domain.account.port.AccountPort;
 import com.wirebarley.remittance.infrastructure.account.entity.AccountEntity;
-import com.wirebarley.remittance.infrastructure.account.repository.JpaAccountRepository;
+import com.wirebarley.remittance.infrastructure.account.repository.AccountRepository;
+import com.wirebarley.remittance.common.util.AES256Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,37 +19,52 @@ import java.util.stream.Collectors;
  */
 @Repository
 @RequiredArgsConstructor
-public class AccountPortAdapter implements AccountPort {
-    private final JpaAccountRepository jpaAccountRepository;
+public class AccountAdapter implements AccountPort {
+    private final AccountRepository accountRepository;
+    private final AES256Util aes256Util;
 
     @Override
     public Account save(Account account) {
         AccountEntity entity = AccountEntity.fromDomain(account);
-        AccountEntity savedEntity = jpaAccountRepository.save(entity);
+        AccountEntity savedEntity = accountRepository.save(entity);
         return savedEntity.toDomain();
     }
 
     @Override
     public Optional<Account> findById(UUID id) {
-        return jpaAccountRepository.findById(id)
+        return accountRepository.findById(id)
                 .map(AccountEntity::toDomain);
     }
 
     @Override
     public Optional<Account> findByAccountNumber(String accountNumber) {
-        return jpaAccountRepository.findByAccountNumber(accountNumber)
+        // 조회 시 암호화된 계좌번호로 조회되므로 암호화를 먼저 수행
+        String encryptedAccountNumber = aes256Util.encrypt(accountNumber);
+        return accountRepository.findByAccountNumber(encryptedAccountNumber)
                 .map(AccountEntity::toDomain);
+    }
+    
+    /**
+     * 마스킹된 계좌번호로 계좌 조회
+     * @param maskedAccountNumber 마스킹된 계좌번호 패턴
+     * @return 도메인 계좌 객체 목록
+     */
+    @Override
+    public List<Account> findByMaskedAccountNumber(String maskedAccountNumber) {
+        return accountRepository.findByMaskedAccountNumberContaining(maskedAccountNumber).stream()
+                .map(AccountEntity::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Account> findAll() {
-        return jpaAccountRepository.findAll().stream()
+        return accountRepository.findAll().stream()
                 .map(AccountEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteById(UUID id) {
-        jpaAccountRepository.deleteById(id);
+        accountRepository.deleteById(id);
     }
 }

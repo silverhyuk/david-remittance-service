@@ -1,7 +1,4 @@
-package com.wirebarley.remittance.infrastructure.common.lock;
-
-import com.wirebarley.remittance.common.error.BusinessException;
-import com.wirebarley.remittance.common.error.ErrorCode;
+package com.wirebarley.remittance.common.error;
 
 /**
  * 분산 락 획득 실패 예외

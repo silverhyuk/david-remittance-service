@@ -1,12 +1,16 @@
 package com.wirebarley.remittance.infrastructure.account.entity;
 
+import com.wirebarley.remittance.common.util.MaskUtil;
 import com.wirebarley.remittance.domain.account.Account;
 import com.wirebarley.remittance.domain.account.AccountStatus;
+import com.wirebarley.remittance.infrastructure.converter.AES256Converter;
+import com.wirebarley.remittance.common.util.AES256Util;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,7 +31,11 @@ public class AccountEntity {
     private UUID id;
 
     @Column(name = "account_number", nullable = false, unique = true)
+    @Convert(converter = AES256Converter.class)
     private String accountNumber;
+    
+    @Column(name = "masked_account_number", nullable = false)
+    private String maskedAccountNumber;
 
     @Column(name = "account_name", nullable = false)
     private String accountName;
@@ -44,6 +52,7 @@ public class AccountEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 
     /**
      * 도메인 객체로 변환
@@ -68,6 +77,7 @@ public class AccountEntity {
         AccountEntity entity = new AccountEntity();
         entity.id = account.getId();
         entity.accountNumber = account.getAccountNumber();
+        entity.maskedAccountNumber = MaskUtil.maskAccountNumber(account.getAccountNumber());
         entity.accountName = account.getAccountName();
         entity.balance = account.getBalance();
         entity.status = account.getStatus();

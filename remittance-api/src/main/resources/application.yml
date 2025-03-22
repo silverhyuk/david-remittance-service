@@ -16,6 +16,11 @@ spring:
       host: localhost
       port: 6379
 
+# 암호화 설정
+security:
+  encryption:
+    key: wirebarleySecretKey1234567890wirebarleySecretKey1234
+
 logging:
   level:
     root: INFO

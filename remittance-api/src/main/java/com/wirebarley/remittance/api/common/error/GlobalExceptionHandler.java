@@ -3,7 +3,7 @@ package com.wirebarley.remittance.api.common.error;
 import com.wirebarley.remittance.common.error.BusinessException;
 import com.wirebarley.remittance.common.error.ErrorCode;
 import com.wirebarley.remittance.common.error.ErrorResponse;
-import com.wirebarley.remittance.infrastructure.common.lock.LockAcquisitionException;
+import com.wirebarley.remittance.common.error.LockAcquisitionException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
